@@ -40,7 +40,7 @@ const HTMLBuilder = {
                                 <div class="sub-q-text" id="q-text-${q.id}-${si}">${sq.text}</div>
                                 ${sqImg}${sqVid}
                                 <div class="answer-area" style="margin-top:10px;">
-                                    <textarea class="student-ans" id="student-ans-${q.id}-${si}" placeholder="תשובה לסעיף ${label}'..." onpaste="handlePaste(event)" style="height:10vh;"></textarea>
+                                    <textarea class="student-ans" id="student-ans-${q.id}-${si}" placeholder="תשובה לסעיף ${label}'..." style="height:10vh;"></textarea>
                                 </div>
                                 <div class="grading-area">
                                     <div style="display:flex; align-items:center; gap:1vw;">
@@ -55,7 +55,7 @@ const HTMLBuilder = {
                         }).join('');
                     } else {
                         modelAnsHtml = q.modelAnswer ? `<div class="model-answer-secret" style="display:none; margin-top:15px; background:#fff3cd; color:#856404; padding:10px; border-radius:5px; border:1px solid #ffeeba;"><strong>🔑 תשובה לדוגמא (למורה):</strong><br><div style="white-space:pre-wrap; margin-top:5px;" id="model-ans-text-${q.id}" class="model-ans-text-content">${q.modelAnswer}</div></div>` : '';
-                        interactionHTML = `<div class="answer-area"><label>תשובה:</label><textarea class="student-ans" id="student-ans-${q.id}" placeholder="כתוב את תשובתך כאן..." onpaste="handlePaste(event)"></textarea></div>`;
+                        interactionHTML = `<div class="answer-area"><label>תשובה:</label><textarea class="student-ans" id="student-ans-${q.id}" placeholder="כתוב את תשובתך כאן..."></textarea></div>`;
                         gradingHTML = `
                         <div class="grading-area">
                             <div style="display:flex; align-items:center; gap:1vw;">
@@ -341,18 +341,6 @@ const HTMLBuilder = {
             }
         }
         
-        // Prevent default copy behavior to secure the exam content, but allow selection for markers
-        document.addEventListener('copy', (e) => {
-            e.preventDefault();
-            alert('העתקת טקסט אסורה במהלך המבחן.');
-        });
-
-        // Handle Paste Prevention in Answer Fields
-        function handlePaste(e) {
-            e.preventDefault();
-            alert('אין להעתיק ולהדביק טקסט. נא לכתוב את התשובה ידנית.');
-        }
-
         document.addEventListener('mouseup', () => {
             if (!markerColor) return;
             const sel = window.getSelection();
