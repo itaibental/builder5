@@ -29,15 +29,13 @@ const UI = {
     },
 
     showConfirm: function(title, text, callback) {
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalText').textContent = text;
-        this.elements.confirmModal.classList.add('open');
-        this.confirmCallback = callback;
+        if(confirm(text)) {
+            callback();
+        }
     },
 
     closeModal: function() {
-        this.elements.confirmModal.classList.remove('open');
-        this.confirmCallback = null;
+        // No modal to close
     },
 
     renderTabs: function() {

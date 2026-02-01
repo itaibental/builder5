@@ -17,15 +17,6 @@ const App = {
         if(UI.elements.examDurationInput) UI.elements.examDurationInput.value = 90;
 
         Utils.setupResizers();
-        
-        // Confirm Modal Setup
-        const confirmBtn = document.getElementById('btnConfirmYes');
-        if(confirmBtn) {
-            confirmBtn.onclick = function() {
-                if (UI.confirmCallback) UI.confirmCallback();
-                UI.closeModal();
-            };
-        }
     },
 
     // --- NEW INLINE EDITING LOGIC ---

@@ -131,6 +131,12 @@ const HTMLBuilder = {
         #timesUpModal, #securityModal, #successModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; color: white; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 10000; text-align: center; }
         #timerBadge { position: fixed; top: 10px; left: 10px; background: white; color: black; padding: 10px; border-radius: 20px; border: 2px solid #2c3e50; font-weight: bold; z-index: 5000; display: none; }
         #securityModal h2, #timesUpModal h2 { font-size: 3rem; margin-bottom: 10px; color: #e74c3c; }
+        
+        .modal-action-btn { padding: 12px 25px; margin: 10px; font-size: 1.1rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-submit-exam { background: #27ae60; color: white; }
+        .btn-extend-time { background: #3498db; color: white; }
+        .btn-cancel { background: #95a5a6; color: white; }
+        #extensionPanel input { padding: 10px; font-size: 1rem; margin: 5px; border-radius: 5px; border: none; text-align: center; }
         </style></head><body>
         ${embeddedProjectData}
         
@@ -168,7 +174,26 @@ const HTMLBuilder = {
         </div>
         
         <div id="timerBadge">זמן: <span id="timerText">--:--</span></div>
-        <div id="timesUpModal"><h2>🛑 הזמן נגמר!</h2><p>הבחינה הסתיימה. לחץ להגשה.</p><button onclick="submitExam()" style="padding:10px 20px; font-size:1.2rem;">הגש בחינה</button></div>
+        
+        <div id="timesUpModal">
+            <h2>🛑 הזמן נגמר!</h2>
+            <div id="timesUpActions">
+                <p>הזמן שהוקצב לבחינה הסתיים.</p>
+                <button class="modal-action-btn btn-submit-exam" onclick="submitExam()">הגש מבחן</button>
+                <button class="modal-action-btn btn-extend-time" onclick="showExtensionInput()">👩‍🏫 בקש הארכת זמן (מורה)</button>
+            </div>
+            <div id="extensionPanel" style="display:none;">
+                <h3>תוספת זמן (למורה בלבד)</h3>
+                <input type="password" id="extTeacherCode" placeholder="קוד מורה">
+                <br>
+                <input type="number" id="extTimeAmount" placeholder="דקות להוספה" value="15" style="width: 100px;">
+                <br>
+                <div style="margin-top: 10px;">
+                    <button class="modal-action-btn btn-submit-exam" onclick="addTime()">אשר תוספת</button>
+                    <button class="modal-action-btn btn-cancel" onclick="cancelExtension()">ביטול</button>
+                </div>
+            </div>
+        </div>
         
         <div id="securityModal">
             <div style="font-size: 5rem;">🔒</div>
@@ -341,6 +366,41 @@ const HTMLBuilder = {
         document.addEventListener('visibilitychange',checkSec);
         document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && examStarted && document.body.dataset.status!=='submitted') { lockExam(); } });
         function unlockExam(){ if(simpleHash(document.getElementById('teacherCodeInput').value)==="${unlockCodeHash}"){ document.getElementById('securityModal').style.display='none'; document.documentElement.requestFullscreen().catch(e=>console.log(e)); runTimer(); } else { alert('קוד שגוי'); } }
+        
+        // --- Time Extension Logic ---
+        function showExtensionInput() {
+            document.getElementById('timesUpActions').style.display = 'none';
+            document.getElementById('extensionPanel').style.display = 'block';
+        }
+
+        function cancelExtension() {
+            document.getElementById('timesUpActions').style.display = 'block';
+            document.getElementById('extensionPanel').style.display = 'none';
+            document.getElementById('extTeacherCode').value = '';
+        }
+
+        function addTime() {
+            const code = document.getElementById('extTeacherCode').value;
+            const minutes = parseInt(document.getElementById('extTimeAmount').value) || 0;
+            
+            if (simpleHash(code) === "${unlockCodeHash}") {
+                if (minutes > 0) {
+                    totalTime = minutes * 60;
+                    document.getElementById('timesUpModal').style.display = 'none';
+                    // Reset modal view
+                    document.getElementById('timesUpActions').style.display = 'block';
+                    document.getElementById('extensionPanel').style.display = 'none';
+                    document.getElementById('extTeacherCode').value = '';
+                    
+                    runTimer();
+                } else {
+                    alert('נא להזין מספר דקות תקין');
+                }
+            } else {
+                alert('קוד מורה שגוי');
+            }
+        }
+
         function submitExam(){
             document.body.dataset.status='submitted';
             if(document.fullscreenElement) document.exitFullscreen();
