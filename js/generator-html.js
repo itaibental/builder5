@@ -344,6 +344,11 @@ const HTMLBuilder = {
                 const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="\${color}" stroke="black" stroke-width="1" d="M28.06 6.94L25.06 3.94a2.003 2.003 0 0 0-2.83 0l-16.17 16.17a2.003 2.003 0 0 0-.58 1.41V26h4.48c.53 0 1.04-.21 1.41-.59l16.17-16.17c.79-.78.79-2.05.52-2.3zM8.5 24H7v-1.5l14.5-14.5 1.5 1.5L8.5 24z"/><path fill="\${color}" d="M4 28l4-4H4z"/></svg>\`;
                 const url = 'data:image/svg+xml;base64,' + btoa(svg);
                 document.body.style.cursor = \`url('\${url}') 0 32, auto\`;
+            } else if (color === 'transparent') {
+                 // Eraser cursor
+                 const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>\`;
+                 // Just use default or text cursor, but logically we are in eraser mode
+                 document.body.style.cursor = 'crosshair';
             } else {
                 document.body.style.cursor = 'default';
             }
@@ -360,11 +365,17 @@ const HTMLBuilder = {
                 if(common.nodeType === 1 && (common.tagName === 'TEXTAREA' || common.tagName === 'INPUT')) return;
                 if(common.nodeType === 3 && (common.parentNode.tagName === 'TEXTAREA' || common.parentNode.tagName === 'INPUT')) return;
 
+                // FIX: Save range, toggle mode, restore range, execute
+                const savedRange = range.cloneRange();
                 document.designMode = "on";
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+                
                 if(document.queryCommandEnabled("hiliteColor")) {
                     document.execCommand("styleWithCSS", false, true);
                     document.execCommand("hiliteColor", false, markerColor);
                 }
+                
                 document.designMode = "off";
                 sel.removeAllRanges();
             }
