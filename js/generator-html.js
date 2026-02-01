@@ -40,7 +40,7 @@ const HTMLBuilder = {
                                 <div class="sub-q-text" id="q-text-${q.id}-${si}">${sq.text}</div>
                                 ${sqImg}${sqVid}
                                 <div class="answer-area" style="margin-top:10px;">
-                                    <textarea class="student-ans" id="student-ans-${q.id}-${si}" placeholder="תשובה לסעיף ${label}'..." onpaste="return false;" style="height:10vh;"></textarea>
+                                    <textarea class="student-ans" id="student-ans-${q.id}-${si}" placeholder="תשובה לסעיף ${label}'..." onpaste="handlePaste(event)" style="height:10vh;"></textarea>
                                 </div>
                                 <div class="grading-area">
                                     <div style="display:flex; align-items:center; gap:1vw;">
@@ -55,7 +55,7 @@ const HTMLBuilder = {
                         }).join('');
                     } else {
                         modelAnsHtml = q.modelAnswer ? `<div class="model-answer-secret" style="display:none; margin-top:15px; background:#fff3cd; color:#856404; padding:10px; border-radius:5px; border:1px solid #ffeeba;"><strong>🔑 תשובה לדוגמא (למורה):</strong><br><div style="white-space:pre-wrap; margin-top:5px;" id="model-ans-text-${q.id}" class="model-ans-text-content">${q.modelAnswer}</div></div>` : '';
-                        interactionHTML = `<div class="answer-area"><label>תשובה:</label><textarea class="student-ans" id="student-ans-${q.id}" placeholder="כתוב את תשובתך כאן..." onpaste="return false;"></textarea></div>`;
+                        interactionHTML = `<div class="answer-area"><label>תשובה:</label><textarea class="student-ans" id="student-ans-${q.id}" placeholder="כתוב את תשובתך כאן..." onpaste="handlePaste(event)"></textarea></div>`;
                         gradingHTML = `
                         <div class="grading-area">
                             <div style="display:flex; align-items:center; gap:1vw;">
@@ -91,7 +91,7 @@ const HTMLBuilder = {
 
         return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>מבחן - ${studentName}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap"><style>
         :root{--primary:#2c3e50;--accent:#3498db;--success:#27ae60;--danger:#e74c3c;}
-        body{font-family:'Rubik',sans-serif;background:#f4f6f8;margin:0;padding:2%;color:#2c3e50;font-size:18px;line-height:1.5; user-select: none;} 
+        body{font-family:'Rubik',sans-serif;background:#f4f6f8;margin:0;padding:2%;color:#2c3e50;font-size:18px;line-height:1.5; user-select: text;} 
         .container{max-width:800px;margin:0 auto;background:white;padding:5%;border-radius:1em;box-shadow:0 1vh 3vh rgba(0,0,0,0.05);}
         textarea{width:100%;height:20vh;padding:2vh;border:1px solid #ccc;border-radius:0.8em;font-family:inherit;font-size:1rem; user-select: text;}
         button{cursor:pointer;}
@@ -146,7 +146,7 @@ const HTMLBuilder = {
             <div class="color-btn" style="background:#a6ff00;" onclick="setMarker('#a6ff00', this)" title="ירוק"></div>
             <div class="color-btn" style="background:#ff4081;" onclick="setMarker('#ff4081', this)" title="ורוד"></div>
             <div class="color-btn" style="background:#00e5ff;" onclick="setMarker('#00e5ff', this)" title="תכלת"></div>
-            <div class="color-btn" style="background:#fff; border:1px solid #ccc; display:flex; justify-content:center; align-items:center; font-size:12px;" onclick="setMarker(null, this)" title="בטל מרקר">❌</div>
+            <div class="color-btn" style="background:#fff; border:1px solid #ccc; display:flex; justify-content:center; align-items:center; font-size:12px;" onclick="setMarker('transparent', this)" title="בטל מרקר">❌</div>
         </div>
 
         <div id="startScreen">
@@ -328,7 +328,7 @@ const HTMLBuilder = {
             markerColor = color;
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            if(color) {
+            if(color && color !== 'transparent') {
                 const svg = \`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="\${color}" stroke="black" stroke-width="1" d="M28.06 6.94L25.06 3.94a2.003 2.003 0 0 0-2.83 0l-16.17 16.17a2.003 2.003 0 0 0-.58 1.41V26h4.48c.53 0 1.04-.21 1.41-.59l16.17-16.17c.79-.78.79-2.05.52-2.3zM8.5 24H7v-1.5l14.5-14.5 1.5 1.5L8.5 24z"/><path fill="\${color}" d="M4 28l4-4H4z"/></svg>\`;
                 const url = 'data:image/svg+xml;base64,' + btoa(svg);
                 document.body.style.cursor = \`url('\${url}') 0 32, auto\`;
@@ -336,14 +336,30 @@ const HTMLBuilder = {
                 document.body.style.cursor = 'default';
             }
         }
+        
+        // Prevent default copy behavior to secure the exam content, but allow selection for markers
+        document.addEventListener('copy', (e) => {
+            e.preventDefault();
+            alert('העתקת טקסט אסורה במהלך המבחן.');
+        });
+
+        // Handle Paste Prevention in Answer Fields
+        function handlePaste(e) {
+            e.preventDefault();
+            alert('אין להעתיק ולהדביק טקסט. נא לכתוב את התשובה ידנית.');
+        }
+
         document.addEventListener('mouseup', () => {
             if (!markerColor) return;
             const sel = window.getSelection();
             if (sel.rangeCount > 0 && !sel.isCollapsed) {
                 const range = sel.getRangeAt(0);
                 const common = range.commonAncestorContainer;
+                
+                // Allow highlighting ANYWHERE except inside input/textarea where student writes
                 if(common.nodeType === 1 && (common.tagName === 'TEXTAREA' || common.tagName === 'INPUT')) return;
                 if(common.nodeType === 3 && (common.parentNode.tagName === 'TEXTAREA' || common.parentNode.tagName === 'INPUT')) return;
+
                 document.designMode = "on";
                 if(document.queryCommandEnabled("hiliteColor")) {
                     document.execCommand("styleWithCSS", false, true);
@@ -353,6 +369,7 @@ const HTMLBuilder = {
                 sel.removeAllRanges();
             }
         });
+        
         const tool = document.getElementById('highlighterTool');
         const handle = document.getElementById('hlDragHandle');
         let isDragging = false, startX, startY, initialLeft, initialTop;
