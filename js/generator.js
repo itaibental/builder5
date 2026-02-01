@@ -35,7 +35,8 @@ const Generator = {
             ExamState.parts, 
             teacherEmail, 
             driveLink, 
-            projectData
+            projectData,
+            ExamState.theme // Pass theme to builder
         );
         
         const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -83,7 +84,8 @@ const Generator = {
             ExamState.parts, 
             teacherEmail, 
             driveLink, 
-            projectData
+            projectData,
+            ExamState.theme // Pass theme
         );
 
         const previewWindow = window.open('', '_blank');

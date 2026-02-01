@@ -38,6 +38,19 @@
                 </div>
             </div>
 
+            <!-- New Design Category -->
+            <details class="editor-category">
+                <summary>🎨 עיצוב</summary>
+                <div class="form-group">
+                    <label>צבע רקע דף</label>
+                    <input type="color" id="bgColorInput" value="#f4f6f8" onchange="App.updateTheme('background', this.value)">
+                </div>
+                <div class="form-group">
+                    <label>צבע כותרות פרקים</label>
+                    <input type="color" id="headerColorInput" value="#2c3e50" onchange="App.updateTheme('header', this.value)">
+                </div>
+            </details>
+
             <details class="editor-category" open>
                 <summary>הגדרות מערכת</summary>
                 <div class="form-group">

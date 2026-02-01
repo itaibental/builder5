@@ -2,7 +2,7 @@
  * HTMLBuilder
  */
 const HTMLBuilder = {
-    build: function(studentName, questions, instructions, examTitle, logoData, solutionDataUrl, duration, unlockCodeHash, parts, teacherEmail, driveLink, projectData) {
+    build: function(studentName, questions, instructions, examTitle, logoData, solutionDataUrl, duration, unlockCodeHash, parts, teacherEmail, driveLink, projectData, theme) {
         
         const tabsHTML = parts.map((p, idx) => `<button class="tab-btn ${idx===0?'active':''}" onclick="showPart('${p.id}')">${p.name}</button>`).join('');
 
@@ -81,7 +81,7 @@ const HTMLBuilder = {
                 }).join('');
             }
             return `<div id="part-${p.id}" class="exam-section ${idx===0?'active':''}">
-                <h2 style="color:#2c3e50; border-bottom:0.3vh solid #3498db; font-weight: 700; padding-bottom:1vh; margin-bottom:3vh;">${p.name}</h2>
+                <h2 style="color:${theme ? theme.header : '#2c3e50'}; border-bottom:0.3vh solid #3498db; font-weight: 700; padding-bottom:1vh; margin-bottom:3vh;">${p.name}</h2>
                 ${partInstrHtml}${qHtml}</div>`;
         }).join('');
 
@@ -89,9 +89,13 @@ const HTMLBuilder = {
         const logoHTML = logoData ? `<img src="${logoData}" alt="Logo" class="school-logo">` : '';
         const embeddedProjectData = projectData ? `<script type="application/json" id="exam-engine-data">${JSON.stringify(projectData).replace(/<\/script>/g, '<\\/script>')}</script>` : '';
 
+        // Colors
+        const bgColor = theme && theme.background ? theme.background : '#f4f6f8';
+        const hdrColor = theme && theme.header ? theme.header : '#2c3e50';
+
         return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>מבחן - ${studentName}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap"><style>
         :root{--primary:#2c3e50;--accent:#3498db;--success:#27ae60;--danger:#e74c3c;}
-        body{font-family:'Rubik',sans-serif;background:#f4f6f8;margin:0;padding:2%;color:#2c3e50;font-size:18px;line-height:1.5; user-select: text;} 
+        body{font-family:'Rubik',sans-serif;background:${bgColor};margin:0;padding:2%;color:#2c3e50;font-size:18px;line-height:1.5; user-select: text;} 
         .container{max-width:800px;margin:0 auto;background:white;padding:5%;border-radius:1em;box-shadow:0 1vh 3vh rgba(0,0,0,0.05);}
         textarea{width:100%;height:20vh;padding:2vh;border:1px solid #ccc;border-radius:0.8em;font-family:inherit;font-size:1rem; user-select: text;}
         button{cursor:pointer;}
@@ -214,7 +218,7 @@ const HTMLBuilder = {
         </div>
         
         <div class="container" id="mainContainer" style="filter:blur(5px);">
-            <div style="text-align:center;">${logoHTML}<h1>${examTitle}</h1></div>
+            <div style="text-align:center;">${logoHTML}<h1 style="color:${hdrColor};">${examTitle}</h1></div>
             
             <div class="teacher-controls" style="display:none;">
                 <h3 style="margin-top:0; color:#d35400;">👨‍🏫 אזור בדיקה וציינון</h3>

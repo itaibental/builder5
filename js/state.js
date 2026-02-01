@@ -14,6 +14,11 @@ const ExamState = {
         general: '',
         parts: {} 
     },
+    // New Theme State
+    theme: {
+        background: '#f4f6f8',
+        header: '#2c3e50'
+    },
     partNamesList: ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "שמיני", "תשיעי", "עשירי"],
     subLabels: ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"],
     tempSubQuestions: [],

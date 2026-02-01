@@ -7,7 +7,8 @@ const UI = {
             'examInstructions', 'examTitleInput', 'previewExamTitle', 'previewLogo', 
             'examDurationInput', 'unlockCodeInput', 'teacherEmailInput', 'driveFolderInput', 
             'toastContainer', 'confirmModal', 'previewPartInstructions',
-            'partNameEditor', 'logoStatus', 'currentPartEditor'
+            'partNameEditor', 'logoStatus', 'currentPartEditor',
+            'bgColorInput', 'headerColorInput'
         ];
         idList.forEach(id => {
             const el = document.getElementById(id);
@@ -66,6 +67,17 @@ const UI = {
             total += partPoints;
         });
         if(this.elements.totalPoints) this.elements.totalPoints.textContent = total;
+    },
+
+    // Apply colors to preview immediately
+    applyTheme: function() {
+        const root = document.documentElement;
+        if (ExamState.theme.background) {
+            root.style.setProperty('--exam-bg', ExamState.theme.background);
+        }
+        if (ExamState.theme.header) {
+            root.style.setProperty('--header-color', ExamState.theme.header);
+        }
     },
 
     renderPreview: function() {

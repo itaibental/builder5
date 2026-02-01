@@ -12,7 +12,8 @@ const DocxBuilder = {
                 .question-box { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
                 .sub-q { margin-right: 20px; margin-top: 10px; }
                 .answer-space { margin-top: 10px; color: #999; }
-                img { max-width: 400px; height: auto; display: block; margin: 10px 0; }
+                img { max-width: 400px; height: auto; display: block; margin: 10px auto; }
+                h1, h2 { text-align: center; }
             </style>
         </head>
         <body>`;

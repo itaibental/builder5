@@ -15,11 +15,22 @@ const App = {
         if(UI.elements.previewExamTitle) UI.elements.previewExamTitle.textContent = ExamState.examTitle;
         if(UI.elements.examInstructions) UI.elements.examInstructions.value = ExamState.instructions.general;
         if(UI.elements.examDurationInput) UI.elements.examDurationInput.value = 90;
+        
+        // Initialize Theme
+        if (UI.elements.bgColorInput) UI.elements.bgColorInput.value = ExamState.theme.background;
+        if (UI.elements.headerColorInput) UI.elements.headerColorInput.value = ExamState.theme.header;
+        UI.applyTheme();
 
         Utils.setupResizers();
     },
 
     // --- NEW INLINE EDITING LOGIC ---
+
+    updateTheme: function(type, value) {
+        if(type === 'background') ExamState.theme.background = value;
+        if(type === 'header') ExamState.theme.header = value;
+        UI.applyTheme();
+    },
 
     addNewQuestionToCurrentPart: function() {
         const question = {
@@ -219,6 +230,10 @@ const App = {
                 ExamState.examTitle = loaded.state.examTitle || 'מבחן בגרות';
                 ExamState.logoData = loaded.state.logoData;
                 ExamState.instructions = loaded.state.instructions || { general: '', parts: {} };
+                // Restore Theme
+                if (loaded.state.theme) {
+                    ExamState.theme = loaded.state.theme;
+                }
 
                 // Restore Meta
                 if (loaded.meta) {
@@ -237,6 +252,11 @@ const App = {
                 }
                 if (UI.elements.previewExamTitle) UI.elements.previewExamTitle.textContent = ExamState.examTitle;
                 if (UI.elements.examInstructions) UI.elements.examInstructions.value = ExamState.instructions.general;
+                
+                // Update color inputs
+                if (UI.elements.bgColorInput) UI.elements.bgColorInput.value = ExamState.theme.background;
+                if (UI.elements.headerColorInput) UI.elements.headerColorInput.value = ExamState.theme.header;
+                UI.applyTheme();
 
                 UI.renderTabs();
                 App.setTab(ExamState.currentTab);
